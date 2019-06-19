@@ -1,5 +1,5 @@
-# bitcoin-core
-A modern Bitcoin Core REST and RPC client to execute administrative tasks, [multiwallet](https://bitcoincore.org/en/2017/09/01/release-0.15.0/#multiwallet) operations and queries about network and the blockchain.
+# nix-core
+A modern NIX Core REST and RPC client to execute administrative tasks, [multiwallet](https://bitcoincore.org/en/2017/09/01/release-0.15.0/#multiwallet) operations and queries about network and the blockchain.
 
 ## Status
 [![npm version][npm-image]][npm-url] [![build status][travis-image]][travis-url]
@@ -9,7 +9,7 @@ A modern Bitcoin Core REST and RPC client to execute administrative tasks, [mult
 Install the package via `yarn`:
 
 ```sh
-yarn add bitcoin-core
+yarn add nix-core
 ```
 
 or via `npm`:
@@ -17,7 +17,7 @@ or via `npm`:
 Install the package via `npm`:
 
 ```sh
-npm install bitcoin-core --save
+npm install nix-core --save
 ```
 
 ## Usage
@@ -26,7 +26,7 @@ npm install bitcoin-core --save
 1. `[agentOptions]` _(Object)_: Optional `agent` [options](https://github.com/request/request#using-optionsagentoptions) to configure SSL/TLS.
 2. `[headers=false]` _(boolean)_: Whether to return the response headers.
 3. `[host=localhost]` _(string)_: The host to connect to.
-4. `[logger=debugnyan('bitcoin-core')]` _(Function)_: Custom logger (by default, `debugnyan`).
+4. `[logger=debugnyan('nix-core')]` _(Function)_: Custom logger (by default, `debugnyan`).
 5. `[network=mainnet]` _(string)_: The network
 6. `[password]` _(string)_: The RPC server user password.
 7. `[port=[network]]` _(string)_: The RPC server port.
@@ -40,10 +40,10 @@ npm install bitcoin-core --save
 
 ### Examples
 #### Using network mode
-The `network` will automatically determine the port to connect to, just like the `bitcoind` and `bitcoin-cli` commands.
+The `network` will automatically determine the port to connect to, just like the `nixd` and `nix-cli` commands.
 
 ```js
-const Client = require('bitcoin-core');
+const Client = require('nix-core');
 const client = new Client({ network: 'regtest' });
 ```
 
@@ -60,7 +60,7 @@ By default, when `ssl` is enabled, strict checking is implicitly enabled.
 const fs = require('fs');
 const client = new Client({
   agentOptions: {
-    ca: fs.readFileSync('/etc/ssl/bitcoind/cert.pem')
+    ca: fs.readFileSync('/etc/ssl/nixd/cert.pem')
   },
   ssl: true
 });
@@ -90,7 +90,7 @@ client.getInfo((error, help) => console.log(help));
 ```
 
 #### Returning headers in the response
-For compatibility with other Bitcoin Core clients.
+For compatibility with other NIX Core clients.
 
 ```js
 const client = new Client({ headers: true });
@@ -133,29 +133,16 @@ Due to [JavaScript's limited floating point precision](http://floating-point-gui
 
 ## Multiwallet
 
-Since Bitcoin Core v0.15.0, it's possible to manage multiple wallets using a single daemon. This enables use-cases such as managing a personal and a business wallet simultaneously in order to simplify accounting and accidental misuse of funds.
+This enables use-cases such as managing a personal and a business wallet simultaneously in order to simplify accounting and accidental misuse of funds.
 
-Historically, the _accounts_ feature was supposed to offer similar functionality, but it has now been replaced by this more powerful feature.
-
-To enable Multi Wallet support, start by specifying the number of added wallets you would like to have available and loaded on the server using the `-wallet` argument multiple times. For convenience, the bitcoin-core docker image will be used, but it's not a requirement:
-
-```sh
-docker run --rm -it -p 18332:18332 ruimarinho/bitcoin-core:0.15-alpine \
-  -printtoconsole \
-  -server \
-  -rpcauth='foo:e1fcea9fb59df8b0388f251984fe85$26431097d48c5b6047df8dee64f387f63835c01a2a463728ad75087d0133b8e6' \
-  -regtest \
-  -wallet=wallet1.dat \
-  -wallet=wallet2.dat \
-  -rpcallowip=172.17.0.0/16
-```
+To enable Multi Wallet support, start by specifying the number of added wallets you would like to have available and loaded on the server using the `-wallet` argument multiple times.
 
 Notice the `rpcauth` hash which has been previously generated for the password `j1DuzF7QRUp-iSXjgewO9T_WT1Qgrtz_XWOHCMn_O-Y=`. Do **not** copy and paste this hash **ever** beyond this exercise.
 
 Instantiate a client for each wallet and execute commands targeted at each wallet:
 
 ```js
-const Client = require('bitcoin-core');
+const Client = require('nix-core');
 
 const wallet1 = new Client({
   network: 'regtest',
@@ -213,20 +200,17 @@ client.getWork();
 To avoid potential issues with prototype references, all methods are still enumerable on the library client prototype.
 
 ### RPC
-Start the `bitcoind` with the RPC server enabled and optionally configure a username and password:
+Start the `nixd` with the RPC server enabled and optionally configure a username and password:
 
-```sh
-docker run --rm -it ruimarinho/bitcoin-core:0.12-alpine -printtoconsole -rpcuser=foo -rpcpassword=bar -server
-```
 
-These configuration values may also be set on the `bitcoin.conf` file of your platform installation.
+These configuration values may also be set on the `nix.conf` file of your platform installation.
 
-By default, port `8332` is used to listen for requests in `mainnet` mode, or `18332` in `testnet` and `regtest` modes (the regtest change will be changed to `18443` in [0.16](https://github.com/bitcoin/bitcoin/pull/10825)). Use the `network` property to initialize the client on the desired mode and automatically set the respective default port. You can optionally set a custom port of your choice too.
+By default, port `6214` is used to listen for requests in `mainnet` mode, or `16214` in `testnet` and `regtest` modes. Use the `network` property to initialize the client on the desired mode and automatically set the respective default port. You can optionally set a custom port of your choice too.
 
 The RPC services binds to the localhost loopback network interface, so use `rpcbind` to change where to bind to and `rpcallowip` to whitelist source IP access.
 
 #### Methods
-All RPC [methods](src/methods.js) are exposed on the client interface as a camelcase'd version of those available on `bitcoind` (see examples below).
+All RPC [methods](src/methods.js) are exposed on the client interface as a camelcase'd version of those available on `nixd` (see examples below).
 
 For a more complete reference about which methods are available, check the [RPC documentation](https://bitcoin.org/en/developer-reference#remote-procedure-calls-rpcs) on the [Bitcoin Core Developer Reference website](https://bitcoin.org/en/developer-reference).
 
@@ -266,17 +250,13 @@ new Client().command(batch).then(([address, error]) => console.log(address, erro
 ```
 
 ### REST
-Support for the REST interface is still **experimental** and the API is still subject to change. These endpoints are also **unauthenticated** so [there are certain risks which you should be aware](https://github.com/bitcoin/bitcoin/blob/master/doc/REST-interface.md#risks), specifically of leaking sensitive data of the node if not correctly protected.
+Support for the REST interface is still **experimental** and the API is still subject to change. These endpoints are also **unauthenticated** so [there are certain risks which you should be aware](https://github.com/nixplatform/nixcore/blob/master/doc/REST-interface.md#risks), specifically of leaking sensitive data of the node if not correctly protected.
 
 Error handling is still fragile so avoid passing user input.
 
-Start the `bitcoind` with the REST server enabled:
+Start the `nixd` with the REST server enabled:
 
-```sh
-docker run --rm -it ruimarinho/bitcoin-core:0.12-alpine -printtoconsole -server -rest
-```
-
-These configuration values may also be set on the `bitcoin.conf` file of your platform installation. Use `txindex=1` if you'd like to enable full transaction query support (note: this will take a considerable amount of time on the first run).
+These configuration values may also be set on the `nix.conf` file of your platform installation. Use `txindex=1` if you'd like to enable full transaction query support (note: this will take a considerable amount of time on the first run).
 
 ### Methods
 
@@ -410,22 +390,17 @@ openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 3650 -nod
 ```
 
 #### Connecting via SSL
-On Bitcoin Core <0.12, you can start the `bitcoind` RPC server directly with SSL:
 
-```sh
-docker run --rm -it -v $(PWD)/ssl:/etc/ssl ruimarinho/bitcoin-core:0.11-alpine -printtoconsole -rpcuser=foo -rpcpassword=bar -rpcssl -rpcsslcertificatechainfile=/etc/ssl/bitcoind/cert.pem -rpcsslprivatekeyfile=/etc/ssl/bitcoind/key.pem -server
-```
-
-On Bitcoin Core >0.12, use must use `stunnel` (`brew install stunnel` or `sudo apt-get install stunnel4`) or an HTTPS reverse proxy to configure SSL since the built-in support for SSL has been removed. The trade off with `stunnel` is performance and simplicity versus features, as it lacks more powerful capacities such as Basic Authentication and caching which are standard in reverse proxies.
+You must use `stunnel` (`brew install stunnel` or `sudo apt-get install stunnel4`) or an HTTPS reverse proxy to configure SSL since the built-in support for SSL has been removed. The trade off with `stunnel` is performance and simplicity versus features, as it lacks more powerful capacities such as Basic Authentication and caching which are standard in reverse proxies.
 
 You can use `stunnel` by configuring `stunnel.conf` with the following service requirements:
 
 ```
-[bitcoin]
+[nix]
 accept = 28332
 connect = 18332
-cert = /etc/ssl/bitcoind/cert.pem
-key = /etc/ssl/bitcoind/key.pem
+cert = /etc/ssl/nixd/cert.pem
+key = /etc/ssl/nixd/key.pem
 ```
 
 The `key` option may be omitted if you concatenating your private and public certificates into a single `stunnel.pem` file.
@@ -439,11 +414,11 @@ stunnel -d 28332 -r 127.0.0.1:18332 -p stunnel.pem -P ''
 Then pass the public certificate to the client:
 
 ```js
-const Client = require('bitcoin-core');
+const Client = require('nix-core');
 const fs = require('fs');
 const client = new Client({
   agentOptions: {
-    ca: fs.readFileSync('/etc/ssl/bitcoind/cert.pem')
+    ca: fs.readFileSync('/etc/ssl/nixd/cert.pem')
   },
   port: 28332,
   ssl: true
@@ -452,7 +427,7 @@ const client = new Client({
 
 ## Logging
 
-By default, all requests made with `bitcoin-core` are logged using [uphold/debugnyan](https://github.com/uphold/debugnyan) with `bitcoin-core` as the logging namespace.
+By default, all requests made with `nix-core` are logged using [uphold/debugnyan](https://github.com/uphold/debugnyan) with `nix-core` as the logging namespace.
 
 Please note that all sensitive data is obfuscated before calling the logger.
 
@@ -466,7 +441,7 @@ const client = new Client();
 client.getTransactionByHash('b4dd08f32be15d96b7166fd77afd18aece7480f72af6c9c7f9c5cbeb01e686fe');
 
 // {
-//   "name": "bitcoin-core",
+//   "name": "nix-core",
 //   "hostname": "localhost",
 //   "pid": 57908,
 //   "level": 20,
@@ -491,9 +466,9 @@ client.getTransactionByHash('b4dd08f32be15d96b7166fd77afd18aece7480f72af6c9c7f9c
 A custom logger can be passed via the `logger` option and it should implement [bunyan's log levels](https://github.com/trentm/node-bunyan#levels).
 
 ## Tests
-Currently the test suite is tailored for Docker (including `docker-compose`) due to the multitude of different `bitcoind` configurations that are required in order to get the test suite passing.
+Currently the test suite is tailored for Docker (including `docker-compose`) due to the multitude of different `nixd` configurations that are required in order to get the test suite passing.
 
-To test using a local installation of `node.js` but with dependencies (e.g. `bitcoind`) running inside Docker:
+To test using a local installation of `node.js` but with dependencies (e.g. `nixd`) running inside Docker:
 
 ```sh
 npm run dependencies
@@ -514,8 +489,3 @@ npm version [<newversion> | major | minor | patch] -m "Release %s"
 
 ## License
 MIT
-
-[npm-image]: https://img.shields.io/npm/v/bitcoin-core.svg?style=flat-square
-[npm-url]: https://npmjs.org/package/bitcoin-core
-[travis-image]: https://img.shields.io/travis/ruimarinho/bitcoin-core.svg?style=flat-square
-[travis-url]: https://travis-ci.org/ruimarinho/bitcoin-core
