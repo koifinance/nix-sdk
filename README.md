@@ -29,14 +29,13 @@ npm install nix-core --save
 4. `[logger=debugnyan('nix-core')]` _(Function)_: Custom logger (by default, `debugnyan`).
 5. `[network=mainnet]` _(string)_: The network
 6. `[password]` _(string)_: The RPC server user password.
-7. `[port=[network]]` _(string)_: The RPC server port.
+7. `[port=[network]]` _(string)_: The RPC server port (nix default: 6214).
 8. `[ssl]` _(boolean|Object)_: Whether to use SSL/TLS with strict checking (_boolean_) or an expanded config (_Object_).
 9. `[ssl.enabled]` _(boolean)_: Whether to use SSL/TLS.
 10. `[ssl.strict]` _(boolean)_: Whether to do strict SSL/TLS checking (certificate must match host).
 11. `[timeout=30000]` _(number)_: How long until the request times out (ms).
 12. `[username]` _(number)_: The RPC server user name.
-13. `[version]` _(string)_: Which version to check methods for ([read more](#versionchecking)).
-14. `[wallet]` _(string)_: Which wallet to manage ([read more](#multiwallet)).
+13. `[wallet]` _(string)_: Which wallet to manage ([read more](#multiwallet)).
 
 ### Examples
 #### Using network mode
@@ -44,7 +43,7 @@ The `network` will automatically determine the port to connect to, just like the
 
 ```js
 const Client = require('nix-core');
-const client = new Client({ network: 'regtest' });
+const client = new Client({ network: 'mainnet' });
 ```
 
 ##### Setting a custom port
@@ -102,31 +101,6 @@ client.getInfo().then(([body, headers]) => console.log(body, headers));
 const [body, headers] = await client.getInfo();
 ```
 
-## Named parameters
-
-Since version v0.14.0, it is possible to send commands via the JSON-RPC interface using named parameters instead of positional ones. This comes with the advantage of making the order of arguments irrelevant. It also helps improving the readability of certain function calls when leaving out arguments for their default value.
-
-You **must** provide a version in the client arguments to enable named parameters.
-
-```js
-const client = new Client({ version: '0.15.1' });
-```
-For instance, take the `getBalance()` call written using positional arguments:
-```js
-const balance = await new Client().getBalance('*', 0);
-```
-
-It is functionally equivalent to using the named arguments `account` and `minconf`, leaving out `include_watchonly` (defaults to `false`):
-
-```js
-const balance = await new Client({ version: '0.15.1' }).getBalance({
-  account: '*',
-  minconf: 0
-});
-```
-
-This feature is available to all JSON-RPC methods that accept arguments.
-
 ### Floating point number precision in JavaScript
 
 Due to [JavaScript's limited floating point precision](http://floating-point-gui.de/), all big numbers (numbers with more than 15 significant digits) are returned as strings to prevent precision loss. This includes both the RPC and REST APIs.
@@ -168,37 +142,6 @@ const wallet2 = new Client({
 }());
 ```
 
-
-### Version Checking
-By default, all methods are exposed on the client independently of the version it is connecting to. This is the most flexible option as defining methods for unavailable RPC calls does not cause any harm and the library is capable of handling a `Method not found` response error correctly.
-
-```js
-const client = new Client();
-
-client.command('foobar');
-// => RpcError: -32601 Method not found
-```
-
-However, if you prefer to be on the safe side, you can enable strict version checking. This will validate all method calls before executing the actual RPC request:
-
-```js
-const client = new Client({ version: '0.12.0' });
-
-client.getHashesPerSec();
-// => Method "gethashespersec" is not supported by version "0.12.0"
-```
-
-If you want to enable strict version checking for the bleeding edge version, you may set a very high version number to exclude recently deprecated calls:
-
-```js
-const client = new Client({ version: `${Number.MAX_SAFE_INTEGER}.0.0` });
-
-client.getWork();
-// => Throws 'Method "getwork" is not supported by version "9007199254740991.0.0"'.
-```
-
-To avoid potential issues with prototype references, all methods are still enumerable on the library client prototype.
-
 ### RPC
 Start the `nixd` with the RPC server enabled and optionally configure a username and password:
 
@@ -209,14 +152,31 @@ By default, port `6214` is used to listen for requests in `mainnet` mode, or `16
 
 The RPC services binds to the localhost loopback network interface, so use `rpcbind` to change where to bind to and `rpcallowip` to whitelist source IP access.
 
-#### Methods
-All RPC [methods](src/methods.js) are exposed on the client interface as a camelcase'd version of those available on `nixd` (see examples below).
+An example `nix.conf` may look like this:
+```
+server=1
+par=1
+rpcbind=127.0.0.1
+rpcallowip=127.0.0.1
+rpcport=3335
+rpcuser=username1
+rpcpassword=password1
+rpcclienttimeout=30
+rpcthreads=2
+rpcworkqueue=1000
+staking=0
+enableaccounts=1
+```
 
-For a more complete reference about which methods are available, check the [RPC documentation](https://bitcoin.org/en/developer-reference#remote-procedure-calls-rpcs) on the [Bitcoin Core Developer Reference website](https://bitcoin.org/en/developer-reference).
+#### Methods
+All RPC [methods](src/methods.js) are exposed on the client interface as a camelcase'd version of those available on `nixd` (see examples below). You can also issue any command you desire by using the `command` command. Example for un-ghosting: `nix.command('unghostamountv2', '1');`
+
+For a more complete reference about which methods are available, especially those unique to NIX, check the [commands documentation on the NIX wiki](https://wiki.nixplatform.io/home/wallet-functionality/console-commands).
 
 ##### Examples
 
-```js
+```js 
+client.command('unghostamount', '1');
 client.createRawTransaction([{ txid: '1eb590cd06127f78bf38ab4140c4cdce56ad9eb8886999eb898ddf4d3b28a91d', vout: 0 }], { 'mgnucj8nYqdrPFh2JfZSB1NmUThUGnmsqe': 0.13 });
 client.sendMany('test1', { mjSk1Ny9spzU2fouzYgLqGUD8U41iR35QN: 0.1, mgnucj8nYqdrPFh2JfZSB1NmUThUGnmsqe: 0.2 }, 6, 'Example Transaction');
 client.sendToAddress('mmXgiR6KAhZCyQ8ndr2BCfEq1wNG2UnyG6', 0.1,  'sendtoaddress example', 'Nemo From Example.com');
@@ -433,7 +393,7 @@ Please note that all sensitive data is obfuscated before calling the logger.
 
 #### Example
 
-Example output defining the environment variable `DEBUG=bitcoin-core`:
+Example output defining the environment variable `DEBUG=nix-core`:
 
 ```javascript
 const client = new Client();
