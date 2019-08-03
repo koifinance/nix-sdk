@@ -48,9 +48,9 @@ function source(...args) {
 
 
 const networks = {
-  mainnet: 8332,
-  regtest: 18332,
-  testnet: 18332
+  mainnet: 6214,
+  regtest: 16214,
+  testnet: 16214
 };
 /**
  * Constructor.
@@ -61,7 +61,7 @@ class Client {
     agentOptions,
     headers = false,
     host = 'localhost',
-    logger = (0, _debugnyan.default)('bitcoin-core'),
+    logger = (0, _debugnyan.default)('nix-core'),
     network = 'mainnet',
     password,
     port,
@@ -309,7 +309,7 @@ _lodash.default.forOwn(_methods.default, (options, method) => {
 
 var _default = Client;
 /**
- * Export Client class (CJS) for compatibility with require('bitcoin-core').
+ * Export Client class (CJS) for compatibility with require('nix-core').
  */
 
 exports.default = _default;

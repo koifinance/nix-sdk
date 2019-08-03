@@ -34,9 +34,9 @@ function source(...args) {
  */
 
 const networks = {
-  mainnet: 8332,
-  regtest: 18332,
-  testnet: 18332
+  mainnet: 6214,
+  regtest: 16214,
+  testnet: 16214
 };
 
 /**
@@ -48,7 +48,7 @@ class Client {
     agentOptions,
     headers = false,
     host = 'localhost',
-    logger = debugnyan('bitcoin-core'),
+    logger = debugnyan('nix-core'),
     network = 'mainnet',
     password,
     port,
@@ -294,7 +294,7 @@ _.forOwn(methods, (options, method) => {
 export default Client;
 
 /**
- * Export Client class (CJS) for compatibility with require('bitcoin-core').
+ * Export Client class (CJS) for compatibility with require('nix-core').
  */
 
 module.exports = Client;
