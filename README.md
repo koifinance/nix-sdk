@@ -175,6 +175,41 @@ For a more complete reference about which methods are available, especially thos
 
 ##### Examples
 
+#### Full ghosting and un-ghosting example
+
+```js
+/*
+    ======================
+    used nix.conf:
+
+    server=1
+    par=1
+    rpcbind=127.0.0.1
+    rpcallowip=127.0.0.1
+    rpcport=3335
+    rpcuser=username1
+    rpcpassword=password1
+    rpcclienttimeout=30
+    rpcthreads=2
+    rpcworkqueue=1000
+    staking=0
+    enableaccounts=1
+    ======================
+ */
+
+const Client = require('nix-core');
+const client = new Client({
+    username: 'username1',
+    password: 'password1',
+    port: 3335,
+    network: 'mainnet' });
+
+client.command('ghostamountv2', '0.1').then(value => console.log(value)); //ghost 0.1 NIX and log response
+client.command('unghostamountv2', '0.1').then(value => console.log(value)); //un-ghost 0.1 NIX and log response
+```
+
+#### Other example commands
+
 ```js 
 client.command('unghostamount', '1');
 client.createRawTransaction([{ txid: '1eb590cd06127f78bf38ab4140c4cdce56ad9eb8886999eb898ddf4d3b28a91d', vout: 0 }], { 'mgnucj8nYqdrPFh2JfZSB1NmUThUGnmsqe': 0.13 });
