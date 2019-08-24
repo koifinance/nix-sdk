@@ -17,7 +17,7 @@
     ======================
  */
 
-const Client = require('./dist/src/index.js');
+const Client = require('nix-core');
 const client = new Client({
     username: 'username1',
     password: 'password1',
