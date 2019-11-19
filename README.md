@@ -1,4 +1,4 @@
-# nix-core
+# nix-sdk
 A modern NIX Core REST and RPC client to execute administrative tasks, [multiwallet](https://bitcoincore.org/en/2017/09/01/release-0.15.0/#multiwallet) operations and queries about network and the blockchain.
 
 ## Status
@@ -9,7 +9,7 @@ A modern NIX Core REST and RPC client to execute administrative tasks, [multiwal
 Install the package via `yarn`:
 
 ```sh
-yarn add nix-core
+yarn add nix-sdk
 ```
 
 or via `npm`:
@@ -17,7 +17,7 @@ or via `npm`:
 Install the package via `npm`:
 
 ```sh
-npm install nix-core --save
+npm install nix-sdk --save
 ```
 
 ## Usage
@@ -26,7 +26,7 @@ npm install nix-core --save
 1. `[agentOptions]` _(Object)_: Optional `agent` [options](https://github.com/request/request#using-optionsagentoptions) to configure SSL/TLS.
 2. `[headers=false]` _(boolean)_: Whether to return the response headers.
 3. `[host=localhost]` _(string)_: The host to connect to.
-4. `[logger=debugnyan('nix-core')]` _(Function)_: Custom logger (by default, `debugnyan`).
+4. `[logger=debugnyan('nix-sdk')]` _(Function)_: Custom logger (by default, `debugnyan`).
 5. `[network=mainnet]` _(string)_: The network
 6. `[password]` _(string)_: The RPC server user password.
 7. `[port=[network]]` _(string)_: The RPC server port (nix default: 6214).
@@ -42,7 +42,7 @@ npm install nix-core --save
 The `network` will automatically determine the port to connect to, just like the `nixd` and `nix-cli` commands.
 
 ```js
-const Client = require('nix-core');
+const Client = require('nix-sdk');
 const client = new Client({ network: 'mainnet' });
 ```
 
@@ -116,7 +116,7 @@ Notice the `rpcauth` hash which has been previously generated for the password `
 Instantiate a client for each wallet and execute commands targeted at each wallet:
 
 ```js
-const Client = require('nix-core');
+const Client = require('nix-sdk');
 
 const wallet1 = new Client({
   network: 'regtest',
@@ -197,7 +197,7 @@ For a more complete reference about which methods are available, especially thos
     ======================
  */
 
-const Client = require('nix-core');
+const Client = require('nix-sdk');
 const client = new Client({
     username: 'username1',
     password: 'password1',
@@ -409,7 +409,7 @@ stunnel -d 28332 -r 127.0.0.1:18332 -p stunnel.pem -P ''
 Then pass the public certificate to the client:
 
 ```js
-const Client = require('nix-core');
+const Client = require('nix-sdk');
 const fs = require('fs');
 const client = new Client({
   agentOptions: {
@@ -422,13 +422,13 @@ const client = new Client({
 
 ## Logging
 
-By default, all requests made with `nix-core` are logged using [uphold/debugnyan](https://github.com/uphold/debugnyan) with `nix-core` as the logging namespace.
+By default, all requests made with `nix-sdk` are logged using [uphold/debugnyan](https://github.com/uphold/debugnyan) with `nix-sdk` as the logging namespace.
 
 Please note that all sensitive data is obfuscated before calling the logger.
 
 #### Example
 
-Example output defining the environment variable `DEBUG=nix-core`:
+Example output defining the environment variable `DEBUG=nix-sdk`:
 
 ```javascript
 const client = new Client();
@@ -436,7 +436,7 @@ const client = new Client();
 client.getTransactionByHash('b4dd08f32be15d96b7166fd77afd18aece7480f72af6c9c7f9c5cbeb01e686fe');
 
 // {
-//   "name": "nix-core",
+//   "name": "nix-sdk",
 //   "hostname": "localhost",
 //   "pid": 57908,
 //   "level": 20,
